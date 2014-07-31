@@ -41,4 +41,8 @@ group :development do
   gem "binding_of_caller"
 end
 
+# Simple form
 gem 'simple_form', '>= 3.1.0.rc1'
+
+# React
+gem 'react-rails'

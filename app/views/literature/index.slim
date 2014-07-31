@@ -1,9 +1,4 @@
 h1
   | Reactjsapp
 
-= simple_form_for :get_books, url: get_books_authors_path, method: :get do |f|
-  = f.submit "Мне повезёт!"
-  = f.collection_select(:author, Author.all, :id, :name)
-  = f.collection_select(:book, Book.none, :id, :name)
-
-h2#main-text.text-center
+.js-literature-box data-action= get_books_authors_path data-method= :get

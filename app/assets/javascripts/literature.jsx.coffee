@@ -45,7 +45,6 @@ $ ->
             this.setState(titleValue: "Выберите произведение")
           else
             this.setState(titleValue: "Выберите автора")
-
         error: (xhr, status, err) =>
           console.error(this.props.url, status, err.toString())
 
@@ -55,16 +54,32 @@ $ ->
       this.state.bookValue =
         id: e.target.value
         text: text
-
       console.log "triggered book #{this.state.bookValue.id}"
       if this.state.bookValue.id != ""
         this.setState(titleValue: "#{this.state.authorValue.text} написал произведение #{this.state.bookValue.text}")
       else
         this.setState(titleValue: "Выберите произведение")
 
+    onSubmit: (e) ->
+      e.preventDefault()
+      console.log "triggered btn"
+      max = $("#get_books_author option").length
+      min = 2
+      random = Math.floor(Math.random() * (max - min + 1)) + min
+      option = $("#get_books_author option:nth-child(#{random})")
+      option.attr('selected','selected')
+      lol =
+        target:
+          value: option.val()
+          text: $("#get_books_author").find("option[value=#{random}]").text()
+      this.onAuthorChange(lol)
+
+      # Берем селект автора и выбираем у него рандомное значение, при этом даем ему еще один параметр (randoming=true)
+      # В методе onAuthorChange в ajax пишем, что если у него есть параметр, то тут же вызываем изменение селекта книг
+
     render: ->
       `<section>
-         <LiteratureForm booksAction={this.props.booksAction} authorsAction={this.props.authorsAction} method={this.props.method} onAuthorChange={this.onAuthorChange} onBookChange={this.onBookChange} books_data= {this.state.books_data} authors_data= {this.state.authors_data}/>
+         <LiteratureForm booksAction={this.props.booksAction} authorsAction={this.props.authorsAction} method={this.props.method} onAuthorChange={this.onAuthorChange} onBookChange={this.onBookChange} onSubmitMethod = {this.onSubmit} books_data= {this.state.books_data} authors_data= {this.state.authors_data}/>
          <ResultTitle text={this.state.titleValue}/>
        </section>`
 
@@ -85,8 +100,11 @@ $ ->
   #   action: route to action
   #   method type of action
   LiteratureForm = React.createClass
+    onSubmit: (e) ->
+      this.props.onSubmitMethod(e)
+
     render: ->
-      `<form accept-charset="UTF-8" action={this.props.action} className="simple_form" method={this.props.method} noValidate="novalidate">
+      `<form accept-charset="UTF-8" action={this.props.action} className="simple_form" method={this.props.method} noValidate="novalidate" onSubmit={this.onSubmit}>
         <div style={{"display":"none"}}>
           <input name="utf8" type="hidden" value="✓" />
         </div>

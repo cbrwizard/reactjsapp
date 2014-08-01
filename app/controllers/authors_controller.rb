@@ -5,7 +5,7 @@ class AuthorsController < ApplicationController
   # @note is called when user changes author select
   def get_books
     @books = []
-    @books = Author.find(params[:id]).books if params[:id].present?
+    @books = Author.find(params[:author_id]).books if params[:author_id].present?
   end
 
   # GET /authors

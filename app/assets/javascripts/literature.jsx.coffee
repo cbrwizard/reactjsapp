@@ -1,6 +1,11 @@
 ###* @jsx React.DOM ###
 
 $ ->
+  # Important dynamic values
+  authorValue = {id:"", text: ""}
+  bookValue = {id:"", text: ""}
+  titleValue = "Выберите автора"
+
   # Whole dynamic container
   # @note is rendered in $(".js-literature-box")
   # @props
@@ -10,8 +15,6 @@ $ ->
     getInitialState: -> {
       authors_data: []
       books_data: []
-      titleValue: "Выберите автора"
-      selected_author: {id:"", text: ""}
     }
 
     # Loads authors
@@ -26,61 +29,85 @@ $ ->
 
     # Changes books to a selected author
     # @note Triggers on author select change
-    onAuthorChange: (e) ->
-      text = if e.target.value == "" then "" else $(e.target).find("option[value=#{e.target.value}]").text()
-      this.state.authorValue =
+    # @param randomMode [Boolean] determines whenever it should work with random values
+    onAuthorChange: (e, randomMode) ->
+      if randomMode == true
+        text = e.target.text
+      else
+        text = if e.target.value == "" then "" else $(e.target).find("option[value=#{e.target.value}]").text()
+      authorValue =
         id: e.target.value
         text: text
 
+      # Gets books of selected author
       $.ajax
         url: this.props.booksAction
         dataType: 'json'
         data:
-          author_id: this.state.authorValue.id
+          author_id: authorValue.id
+        # Populates books select
         success: (data) =>
-          console.log "received #{data.length} books"
           this.setState({books_data: data})
           $("#get_books_book").val("")
-          if this.state.authorValue.id != ""
-            this.setState(titleValue: "Выберите произведение")
+
+          # Triggers book change for a random book
+          if randomMode == true
+            max = data.length + 1
+            min = 2
+            random = get_random(min, max)
+            option = $("#get_books_book option:nth-child(#{random})")
+            option.attr('selected','selected')
+            fake_change_object =
+              target:
+                value: option.val()
+                text: option.text()
+            this.onBookChange(fake_change_object, randomMode)
           else
-            this.setState(titleValue: "Выберите автора")
-        error: (xhr, status, err) =>
+            if authorValue.id != ""
+              titleValue = "Выберите произведение"
+            else
+              titleValue = "Выберите автора"
+            this.forceUpdate()
+        fail: (xhr, status, err) =>
           console.error(this.props.url, status, err.toString())
 
-    # Triggers on book select change
-    onBookChange: (e) ->
-      text = if e.target.value == "" then "" else $(e.target).find("option[value=#{e.target.value}]").text()
-      this.state.bookValue =
+    # Changes title to selected book
+    # @note triggers on book select change
+    # @param randomMode [Boolean] determines whenever it should work with random values
+    onBookChange: (e, randomMode) ->
+      if randomMode == true
+        text = e.target.text
+      else
+        text = if e.target.value == "" then "" else $(e.target).find("option[value=#{e.target.value}]").text()
+      bookValue =
         id: e.target.value
         text: text
-      console.log "triggered book #{this.state.bookValue.id}"
-      if this.state.bookValue.id != ""
-        this.setState(titleValue: "#{this.state.authorValue.text} написал произведение #{this.state.bookValue.text}")
-      else
-        this.setState(titleValue: "Выберите произведение")
 
+      if bookValue.id != ""
+        titleValue = "#{authorValue.text} написал произведение #{bookValue.text}"
+      else
+        titleValue = "Выберите произведение"
+      this.forceUpdate()
+
+    # On lucky button click randomize author and books
     onSubmit: (e) ->
       e.preventDefault()
-      console.log "triggered btn"
       max = $("#get_books_author option").length
       min = 2
-      random = Math.floor(Math.random() * (max - min + 1)) + min
+      random = get_random(min, max)
       option = $("#get_books_author option:nth-child(#{random})")
       option.attr('selected','selected')
-      lol =
+      fake_change_object =
         target:
           value: option.val()
-          text: $("#get_books_author").find("option[value=#{random}]").text()
-      this.onAuthorChange(lol)
-
-      # Берем селект автора и выбираем у него рандомное значение, при этом даем ему еще один параметр (randoming=true)
-      # В методе onAuthorChange в ajax пишем, что если у него есть параметр, то тут же вызываем изменение селекта книг
+          text: option.text()
+      randomMode = true
+      this.onAuthorChange(fake_change_object, randomMode)
 
     render: ->
       `<section>
          <LiteratureForm booksAction={this.props.booksAction} authorsAction={this.props.authorsAction} method={this.props.method} onAuthorChange={this.onAuthorChange} onBookChange={this.onBookChange} onSubmitMethod = {this.onSubmit} books_data= {this.state.books_data} authors_data= {this.state.authors_data}/>
-         <ResultTitle text={this.state.titleValue}/>
+         <ResultTitle text={titleValue}/>
        </section>`
 
   # Resulting title
@@ -172,3 +199,11 @@ $ ->
         method: container.attr("data-method")
       }), container[0]
     )
+
+
+# Gets random number
+# @param min [Integer] min of range
+# @param max [Integer] max of range
+# @return [Integer]
+get_random = (min, max) ->
+  Math.floor(Math.random() * (max - min + 1)) + min

@@ -1,6 +1,8 @@
 ###* @jsx React.DOM ###
 
-$ ->
+window.test = true
+
+$ =>
   # Important dynamic values
   authorValue = {id:"", text: ""}
   bookValue = {id:"", text: ""}
@@ -11,7 +13,7 @@ $ ->
   # @props
   #   action: route to action
   #   method type of action
-  LiteratureBox = React.createClass
+  @LiteratureBox = React.createClass
     getInitialState: -> {
       authors_data: []
       books_data: []
@@ -114,7 +116,7 @@ $ ->
   # @note is used in LiteratureBox
   # @props
   #   text [String] text of this title
-  ResultTitle = React.createClass
+  @ResultTitle = React.createClass
     render: ->
       `<h2 className="text-center" id="main-text">
         {this.props.text}
@@ -126,7 +128,7 @@ $ ->
   # @props
   #   action: route to action
   #   method type of action
-  LiteratureForm = React.createClass
+  @LiteratureForm = React.createClass
     onSubmit: (e) ->
       this.props.onSubmitMethod(e)
 
@@ -148,7 +150,7 @@ $ ->
   #   name: html name of select
   #   data: data for options
   #   label: label text
-  LiteratureFormGroup = React.createClass
+  @LiteratureFormGroup = React.createClass
     render: ->
       # kinda .downcases a label
       placeholder = "Выберите" + " " + this.props.label.charAt(0).toLowerCase() + this.props.label.slice(1)
@@ -163,7 +165,7 @@ $ ->
   # @props
   #   id: id of data element
   #   text: text of data element
-  LiteratureOption = React.createClass
+  @LiteratureOption = React.createClass
     render: ->
       `<option value={this.props.id}>{this.props.text}</option>`
 
@@ -174,7 +176,7 @@ $ ->
   #   id: html id of select
   #   name: html name of select
   #   data: data for options
-  LiteratureSelect = React.createClass
+  @LiteratureSelect = React.createClass
     onInputChange: (e) ->
       this.props.onChangeMethod(e)
 
@@ -188,17 +190,20 @@ $ ->
        </select>`
 
 
-  # Renders stuff on page
-  # React.renderComponent(
-  container = $(".js-literature-box")
-  if container.length > 0
-    React.renderComponent(
-      new LiteratureBox({
-        booksAction: container.attr("data-books-action")
-        authorsAction: container.attr("data-authors-action")
-        method: container.attr("data-method")
-      }), container[0]
-    )
+  @renderForm = ->
+    # Renders stuff on page
+    # React.renderComponent(
+    container = $(".js-literature-box")
+    if container.length > 0
+      React.renderComponent(
+        new LiteratureBox({
+          booksAction: container.attr("data-books-action")
+          authorsAction: container.attr("data-authors-action")
+          method: container.attr("data-method")
+        }), container[0]
+      )
+
+  renderForm()
 
 
 # Gets random number

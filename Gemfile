@@ -41,6 +41,11 @@ group :development do
   gem "binding_of_caller"
 end
 
+group :test, :development do
+  # Integrates jasmine js testing soft
+  gem 'jasmine-rails'
+end
+
 # Simple form
 gem 'simple_form', '>= 3.1.0.rc1'
 

@@ -1,12 +1,24 @@
 # include spec/javascripts/helpers/some_helper_file.js and app/assets/javascripts/foo.js
 # require helpers/some_helper_file
 #= require literature
-describe "Foo", ->
-  it "does something", ->
-    reactUtils = React.addons.TestUtils
-    expect(test).toBe true
-    label = React.DOM.label({className: "commentBox"},
-      "Hello, world! I am a CommentBox."
+describe "Literature", ->
+  reactUtils = React.addons.TestUtils
+  title = null
+  literatureBox = null
+
+  beforeEach ->
+    literatureBox = reactUtils.renderIntoDocument(
+      new LiteratureBox({
+        booksAction: "/authors/get_books"
+        authorsAction: "/authors"
+        method: "get"
+      })
     )
-    reactUtils.renderIntoDocument(label)
-    expect(label).toBeDefined()
+    title = reactUtils.findRenderedDOMComponentWithTag(literatureBox, 'h2')
+
+  it "has no data at start", ->
+    expect(literatureBox.state.authors_data).toEqual []
+    expect(literatureBox.state.books_data).toEqual []
+
+  it "shows initial title", ->
+    expect(title.getDOMNode().textContent).toEqual 'Выберите автора'

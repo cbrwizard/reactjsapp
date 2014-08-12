@@ -93,16 +93,25 @@ $ =>
     # On lucky button click randomize author and books
     onSubmit: (e) ->
       e.preventDefault()
-      max = $("#get_books_author option").length
-      min = 2
-      random = get_random(min, max)
-      option = $("#get_books_author option:nth-child(#{random})")
-      option.attr('selected','selected')
-      fake_change_object =
-        target:
-          value: option.val()
-          text: option.text()
+#      console.log e
+      # Test case
+      if e.fake == true
+        fake_change_object =
+          target:
+            value: e.value
+            text: e.text
+      else
+        max = $("#get_books_author option").length
+        min = 2
+        random = get_random(min, max)
+        option = $("#get_books_author option:nth-child(#{random})")
+        option.attr('selected','selected')
+        fake_change_object =
+          target:
+            value: option.val()
+            text: option.text()
       randomMode = true
+      console.log fake_change_object
       this.onAuthorChange(fake_change_object, randomMode)
 
     render: ->

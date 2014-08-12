@@ -1,7 +1,5 @@
 ###* @jsx React.DOM ###
 
-window.test = true
-
 $ =>
   # Important dynamic values
   authorValue = {id:"", text: ""}
@@ -108,7 +106,7 @@ $ =>
 
     render: ->
       `<section>
-         <LiteratureForm booksAction={this.props.booksAction} authorsAction={this.props.authorsAction} method={this.props.method} onAuthorChange={this.onAuthorChange} onBookChange={this.onBookChange} onSubmitMethod = {this.onSubmit} books_data= {this.state.books_data} authors_data= {this.state.authors_data}/>
+         <LiteratureForm booksAction={this.props.booksAction} authorsAction={this.props.authorsAction} method={this.props.method} onAuthorChange={this.onAuthorChange} onBookChange={this.onBookChange} onSubmitMethod = {this.onSubmit} books_data= {this.state.books_data} authors_data= {this.state.authors_data} key="literatureForm"/>
          <ResultTitle text={titleValue}/>
        </section>`
 
@@ -137,8 +135,8 @@ $ =>
         <div style={{"display":"none"}}>
           <input name="utf8" type="hidden" value="✓" />
         </div>
-        <LiteratureFormGroup id="get_books_author" name="get_books[author]" label="Имя автора" data={this.props.authors_data} onChangeMethod={this.props.onAuthorChange} />
-        <LiteratureFormGroup id="get_books_book" name="get_books[book]" label="Произведение" data={this.props.books_data} onChangeMethod={this.props.onBookChange} />
+        <LiteratureFormGroup id="get_books_author" name="get_books[author]" label="Имя автора" data={this.props.authors_data} onChangeMethod={this.props.onAuthorChange} key="authorInput" />
+        <LiteratureFormGroup id="get_books_book" name="get_books[book]" label="Произведение" data={this.props.books_data} onChangeMethod={this.props.onBookChange} key="booksInput"/>
         <input className="btn btn-success" name="commit" type="submit" value="Мне повезёт!" />
       </form>`
 
@@ -156,7 +154,7 @@ $ =>
       placeholder = "Выберите" + " " + this.props.label.charAt(0).toLowerCase() + this.props.label.slice(1)
       `<div className="form-group">
         <label htmlFor={this.props.id}>{this.props.label}</label>
-        <LiteratureSelect id={this.props.id} name={this.props.name} data={this.props.data} placeholder={placeholder} onChangeMethod={this.props.onChangeMethod} />
+        <LiteratureSelect id={this.props.id} name={this.props.name} data={this.props.data} placeholder={placeholder} onChangeMethod={this.props.onChangeMethod} key={this.props.name} />
       </div>`
 
 
@@ -182,28 +180,16 @@ $ =>
 
     render: ->
       select_options = this.props.data.map((option) ->
-        `<LiteratureOption id={option.id} text={option.text} />`
+        `<LiteratureOption id={option.id} text={option.text} key={option.id} />`
       )
       `<select className="form-control" id={this.props.id} name={this.props.name} onChange={this.onInputChange}>
         <option value="">{this.props.placeholder}</option>
         {select_options}
        </select>`
 
-
-  @renderForm = ->
-    # Renders stuff on page
-    # React.renderComponent(
-    container = $(".js-literature-box")
-    if container.length > 0
-      React.renderComponent(
-        new LiteratureBox({
-          booksAction: container.attr("data-books-action")
-          authorsAction: container.attr("data-authors-action")
-          method: container.attr("data-method")
-        }), container[0]
-      )
-
-  renderForm()
+  container = $(".js-literature-box")
+  if container.length > 0
+    renderForm(container)
 
 
 # Gets random number
@@ -212,3 +198,17 @@ $ =>
 # @return [Integer]
 get_random = (min, max) ->
   Math.floor(Math.random() * (max - min + 1)) + min
+
+
+# Renders the whole form
+# param container [jQuery selector] where the form should be rendered
+@renderForm = (container) ->
+  # Renders stuff on page
+  # React.renderComponent(
+  React.renderComponent(
+    new LiteratureBox({
+      booksAction: container.attr("data-books-action")
+      authorsAction: container.attr("data-authors-action")
+      method: container.attr("data-method")
+    }), container[0]
+  )

@@ -31,7 +31,7 @@ $ =>
     # @note Triggers on author select change
     # @param randomMode [Boolean] determines whenever it should work with random values
     onAuthorChange: (e, randomMode) ->
-      if randomMode == true
+      if randomMode == true || e.fake == true
         text = e.target.text
       else
         text = if e.target.value == "" then "" else $(e.target).find("option[value=#{e.target.value}]").text()
@@ -75,13 +75,14 @@ $ =>
     # @note triggers on book select change
     # @param randomMode [Boolean] determines whenever it should work with random values
     onBookChange: (e, randomMode) ->
-      if randomMode == true
+      if randomMode == true || e.fake == true
         text = e.target.text
       else
         text = if e.target.value == "" then "" else $(e.target).find("option[value=#{e.target.value}]").text()
       bookValue =
         id: e.target.value
         text: text
+      console.log text
 
       if bookValue.id != ""
         titleValue = "#{authorValue.text} написал произведение #{bookValue.text}"

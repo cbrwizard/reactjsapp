@@ -27,27 +27,52 @@ describe "Initial state", ->
     setTimeout  ->
       expect(literatureBox.state.authors_data).not.toEqual []
       done()
-    , 100
+    , 200
 
 
-describe "Author change", ->
+describe "Selects change", ->
   beforeEach (done) ->
     setTimeout ->
-      expect(literatureBox.state.authors_data).not.toEqual []
+      expect(literatureBox.state.authors_data.length).not.toEqual 0
       done()
-    , 100
+    , 200
 
-  it "changes title on author change", (done) ->
-    author_select = reactUtils.findAllInRenderedTree(literatureBox,(component) ->
+    authorsSelect = reactUtils.findAllInRenderedTree(literatureBox,(component) ->
       component.getDOMNode().id == "get_books_author"
     )[0]
 
     fake_change_object =
       target:
         value: 2
-    reactUtils.Simulate.change(author_select.getDOMNode(), fake_change_object)
+        text: "Мега автор"
+      fake: true
 
-    setTimeout ->
-      expect(title.getDOMNode().textContent).toEqual 'Выберите произведение'
-      done()
-    , 100
+    reactUtils.Simulate.change(authorsSelect.getDOMNode(), fake_change_object)
+
+
+  describe "Author change", ->
+    it "changes title on author change", (done) ->
+      setTimeout ->
+        expect(title.getDOMNode().textContent).toEqual 'Выберите произведение'
+        done()
+      , 200
+
+
+  describe "Book change", ->
+    it "changes title on book change", (done) ->
+      booksSelect = reactUtils.findAllInRenderedTree(literatureBox,(component) ->
+        component.getDOMNode().id == "get_books_book"
+      )[0]
+
+      fake_change_object =
+        target:
+          value: 2
+          text: "Мега произведение"
+        fake: true
+
+      reactUtils.Simulate.change(booksSelect.getDOMNode(), fake_change_object)
+
+      setTimeout ->
+        expect(title.getDOMNode().textContent).toEqual 'Мега автор написал произведение Мега произведение'
+        done()
+      , 200
